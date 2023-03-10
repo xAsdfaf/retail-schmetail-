@@ -9,9 +9,12 @@ router.get('/', (req, res) => {
     res.json(categoryList);
   });
   // be sure to include its associated Products
-  Product.findAll().then((productList) => {
-    res.json(productList);
-  });
+  const prodData = Product.findOne({ where: { id: req.body.id } });
+  if (!prodData) {
+    res
+      .status(400)
+      .json({ message: 'No product associated with this category!' })
+  }
 });
 
 router.get('/:id', (req, res) => {
@@ -22,27 +25,27 @@ router.get('/:id', (req, res) => {
       res.status(404).json({ message: 'No category associated with this ID!' });
       return;
     }
-      res.status(200).json(cateData);
+    res.status(200).json(cateData);
   } catch (err) {
     res.status(400).json(err);
-  }
+  };
   // be sure to include its associated Products
   try {
-    const prodData = Category.findByPk(req.params.id);
+    let prodData = Product.findByPk(req.params.id);
     if (!prodData) {
       res.status(404).json({ message: 'No category associated with this ID!' });
       return;
     }
-      res.status(200).json(prodData);
+    res.status(200).json(prodData);
   } catch (err) {
     res.status(400).json(err);
-  }
+  };
 });
 
 router.post('/', (req, res) => {
   // create a new category
   try {
-    const cateData = User.create(req.body);
+    let cateData = User.create(req.body);
     res.status(200).json(cateData);
   } catch (err) {
     res.status(400).json(err);
@@ -52,7 +55,7 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
   try {
-    const cateData = User.update(req.body, {
+    let cateData = User.update(req.body, {
       where: {
         id: req.params.id,
       },
@@ -71,13 +74,13 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
   try {
-    const cateData = User.destroy({
+    let cateData = Category.destroy({
       where: {
         id: req.params.id,
       },
     });
     if (!cateData) {
-      res.status(404).json({ message: 'No user with this id!' });
+      res.status(404).json({ message: 'No category associated with this ID!' });
       return;
     }
     res.status(200).json(cateData);

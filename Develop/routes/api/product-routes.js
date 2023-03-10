@@ -5,14 +5,60 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // get all products
 router.get('/', (req, res) => {
-  // find all products
+  // find all products 
+  Product.findAll().then((productList) => {
+    res.json(productList);
+  });
   // be sure to include its associated Category and Tag data
+  const cateData = Category.findOne({ where: { id: req.body.id } });
+  if(!cateData) {
+    res
+    .status(400)
+    .json({ message: 'No category associated with this product!' })
+  }
+  const tagData = Tag.findOne({ where: { id: req.body.id } });
+  if(!tagData) {
+    res
+    .status(400)
+    .json({ message: 'No tag associated with this product!' })
+  }
 });
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
+  try {
+    const prodData = Product.findByPk(req.params.id);
+    if (!prodData) {
+      res.status(404).json({ message: 'No product associated with this ID!' });
+      return;
+    }
+    res.status(200).json(prodData);
+  } catch (err) {
+    res.status(400).json(err);
+  };
   // be sure to include its associated Category and Tag data
+  try {
+    let cateData = Category.findOne(req.params.id);
+    if (!cateData) {
+      res.status(404).json({ message: 'No category associated with this ID!' });
+      return;
+    }
+    res.status(200).json(cateData);
+  } catch (err) {
+    res.status(400).json(err);
+  };
+
+  try {
+    let tagData = Tag.findOne(req.params.id);
+    if (!tagData) {
+      res.status(404).json({ message: 'No tag associated with this ID!' });
+      return;
+    }
+    res.status(200).json(tagData);
+  } catch (err) {
+    res.status(400).json(err);
+  };
 });
 
 // create new product
@@ -91,6 +137,20 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  try {
+    let prodData = User.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!prodData) {
+      res.status(404).json({ message: 'No product associated with this ID!' });
+      return;
+    }
+    res.status(200).json(prodData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
