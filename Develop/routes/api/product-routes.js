@@ -6,7 +6,17 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // get all products
 router.get('/', (req, res) => {
   // find all products 
-  Product.findAll().then((productList) => {
+  Product.findAll({
+    include: [
+      {
+        model: Category
+      },
+      {
+        model: Tag
+      }
+    ]
+  })
+  .then((productList) => {
     res.json(productList);
   });
   // be sure to include its associated Category and Tag data
@@ -27,38 +37,31 @@ router.get('/', (req, res) => {
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
-  try {
-    const prodData = Product.findByPk(req.params.id);
-    if (!prodData) {
-      res.status(404).json({ message: 'No product associated with this ID!' });
-      return;
-    }
-    res.status(200).json(prodData);
-  } catch (err) {
-    res.status(400).json(err);
-  };
+  Product.findOne({
+    where: {
+      id: req.params.id
+    },
+    include: [
+      {
+        model: Category
+      },
+      {
+        model: Tag
+      }
+    ]
+  })
+    .then(productData => {
+      if (!productData) {
+        res.json({ message: "There is no product with that id" })
+        return;
+      }
+      res.json(productData)
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(err);
+    });
   // be sure to include its associated Category and Tag data
-  try {
-    let cateData = Category.findOne(req.params.id);
-    if (!cateData) {
-      res.status(404).json({ message: 'No category associated with this ID!' });
-      return;
-    }
-    res.status(200).json(cateData);
-  } catch (err) {
-    res.status(400).json(err);
-  };
-
-  try {
-    let tagData = Tag.findOne(req.params.id);
-    if (!tagData) {
-      res.status(404).json({ message: 'No tag associated with this ID!' });
-      return;
-    }
-    res.status(200).json(tagData);
-  } catch (err) {
-    res.status(400).json(err);
-  };
 });
 
 // create new product
