@@ -1,5 +1,7 @@
 # Module 13 - E-commerce Back End
 
+## [Video Link](https://www.youtube.com/watch?v=TxAkR3ERAug&ab_channel=Asdfaf)
+
 ## Description
 
 - A database that is changeable to the user's need, allowing them to update categories, products, and product tags.
